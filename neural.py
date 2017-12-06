@@ -1,92 +1,41 @@
 import numpy as np
+import read_data, label_binarize, performance_metrics, initialize, forwardprop, backprop
 
-def sigmoid(x):
-	return 1. / (1 + np.exp(-x))
+#np.random.seed(42)
 
-def loss(Y, output_layer, num_trainset):
-	return np.sum((Y - out[num_layers-1]) ** 2) / num_trainset
-	
 alpha = 0.1
 
-num_layers = 3
-num_trainset = 10
-hidden = [3, 4, 2] # No. of nodes in each layer
+X, Y = read_data.input()
 
-X = np.random.randn(num_trainset, hidden[0])
-Y = np.random.randn(num_trainset, hidden[-1])
+X = X.reshape(X.shape[0], X.shape[1])
+Y = label_binarize.label_binarize(Y, classes = [0, 1])
+#print Y
 
-num_epochs = 20
+num_trainset = X.shape[0]
+num_class = 2
 
-out = []
-net_in = []
-net_in_bias = []
-theta = []
-error = []
-dtheta = []
+# UPDATE THESE
+num_layers = 6
+hidden = [2, 3, 2, 2, 2, 2] # No. of nodes in each layer
+#UPDATE THESE
 
-#Net Input, Activation
-for i in xrange(num_layers): # 0 1 2
-	temp = np.zeros((num_trainset, hidden[i]))
-	out.append(temp)
-	net_in.append(temp)
+num_epochs = 10
 
-out[0] = X # Input
-
-#Error
-for i in xrange(num_layers): # 0 1 2
-	temp = np.zeros((hidden[i]+1, 1)) #error[0] not to be used
-	error.append(temp)
-
-#Bias Appended net_in
-for i in xrange(num_layers): # 0 1 2
-	temp = np.zeros((num_trainset, hidden[i]+1))
-	net_in_bias.append(temp)
-
-#Theta
-theta.append(0) # Dummy
-for i in xrange(num_layers-1): # 0 1
-	temp = np.random.randn(hidden[i]+1, hidden[i+1])
-	theta.append(temp) #Theta indices: 1 2 ...
-
-#dtheta
-dtheta.append(0) # Dummy
-for i in xrange(num_layers-1): # 0 1
-	temp = np.random.randn(hidden[i]+1, hidden[i+1])
-	dtheta.append(temp) #dtheta indices: 1 2 ...
+out, net_in, net_in_bias, theta, error, dtheta = initialize.init(X, num_layers, hidden)
+#print theta[1]
 
 for epoch in xrange(num_epochs):
-	print "Epoch: " + str(epoch),
+	#print "Epoch: " + str(epoch),
 
 	#Forward Propagation
-	for i in range(1, num_layers): # 1 2
-
-		net_in_bias[i-1] = np.append(out[i-1], np.ones((num_trainset, 1)), axis = 1) 
-		net_in[i] = np.matmul(net_in_bias[i-1], theta[i])
-		out[i] = sigmoid(net_in[i])
+	out, net_in, net_in_bias = forwardprop.forward(num_layers, num_trainset, net_in_bias, out, net_in, theta)
 	
 	#Backpropagation
+	error, dtheta, theta = backprop.back(num_layers, num_trainset, error, out, hidden, net_in_bias, theta, dtheta, alpha, Y)
+	#print error[3]	
+	#print "Loss:" + str(performance_metrics.loss(Y, out[num_layers-1], num_trainset))
 
-	#Error Calculation
-	for i in xrange(num_layers-1, 0, -1): # 3 2 1 
-
-		if i == num_layers-1:
-			error[i] = np.mean(out[i] * (1 - out[i]) * (Y - out[i]), axis = 0).reshape(hidden[i], 1)
-		elif i == num_layers-2:
-			error[i] = np.mean(net_in_bias[i] * (1 - net_in_bias[i]) * np.transpose(np.matmul(theta[i+1], error[i+1])), axis = 0).reshape(hidden[i]+1, 1)
-			# Ignore last node
-		else:
-			error[i] = np.mean(net_in_bias[i] * (1 - net_in_bias[i]) * np.transpose(np.matmul(theta[i+1], error[i+1][:-1])), axis = 0).reshape(hidden[i]+1, 1)
-
-	#Gradient Calculation
-	for i in xrange(num_layers-1, 0, -1):
-
-		if i == num_layers-1:
-			dtheta[i] = np.matmul(np.transpose(net_in_bias[i-1]), np.repeat(error[i].reshape(1, hidden[i]), num_trainset, axis = 0)) * alpha
-		else:
-			dtheta[i] = np.matmul(np.transpose(net_in_bias[i-1]), np.repeat(error[i][:-1].reshape(1, hidden[i]), num_trainset, axis = 0)) * alpha
-
-	#Weight Update
-	for i in xrange(1, num_layers):
-		theta[i] += dtheta[i]
-
-	print "Loss:" + str(loss(Y, out[num_layers-1], num_trainset))
+print performance_metrics.confusion_matrix(Y, out[num_layers-1], num_class)
+print (performance_metrics.accuracy(Y, out[num_layers-1]))
+# print "Precision: " + str(performance_metrics.precision(Y, out[num_layers-1], num_class))
+# print "Recall: " + str(performance_metrics.recall(Y, out[num_layers-1], num_class))
