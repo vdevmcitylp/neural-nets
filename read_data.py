@@ -1,17 +1,40 @@
 import numpy as np
-import label_binarize
 
+# def input():
+# 	f = open('../../datasets/Corners.txt', 'r')
+
+# 	info = f.readlines()
+
+# 	X = []
+# 	Y = []
+
+# 	for item in info:
+
+# 		item = item.split()
+# 		x1 = float(item[0])
+# 		x2 = float(item[1])
+# 		y = float(item[2])
+
+# 		x = np.append(x1, x2)
+
+# 		X.append(x)
+# 		Y.append(y)
+
+# 	X = np.array(X)
+# 	Y = np.array(Y)
+
+# 	return X, Y
+		
 def input():
-	f = open('../../datasets/clusterincluster.txt', 'r')
+	f = open('../../datasets/Image1.txt', 'r')
 
 	info = f.readlines()
-
+		
 	X = []
 	Y = []
 
 	for item in info:
-
-		item = item.split()
+		item = item.split(",")
 		x1 = float(item[0])
 		x2 = float(item[1])
 		y = float(item[2])
@@ -24,8 +47,8 @@ def input():
 	X = np.array(X)
 	Y = np.array(Y)
 
-	return X, Y
-		
+	return X, Y		
+
 # x = []
 # y = []
 
@@ -39,3 +62,4 @@ def input():
 # Y = np.array(Y)
 
 # return X, Y
+#input()

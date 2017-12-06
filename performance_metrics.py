@@ -22,8 +22,8 @@ def accuracy(target, predicted):
 	non_zero = np.count_nonzero(temp)
 	zero = target_nb.shape[0] - non_zero
 
-	#return float(zero) / target_nb.shape[0]
-	return target_nb, predicted_nb
+	return float(zero) / target_nb.shape[0]
+	#return target_nb, predicted_nb
 
 def precision(target, predicted, num_class):
 	
