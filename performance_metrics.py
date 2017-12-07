@@ -51,4 +51,9 @@ def recall(target, predicted, num_class):
 def loss(Y, output_layer, num_trainset):
 	return np.sum((Y - output_layer) ** 2) / num_trainset	
 
-	
+def sum_error(error, num_layers):
+	sum_square_error = np.zeros((num_layers, 1)) # 0 not to be used
+	for i in xrange(num_layers):
+		sum_square_error[i] = (np.sum(error[i]**2))**0.5
+
+	return sum_square_error

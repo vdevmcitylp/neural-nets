@@ -1,6 +1,6 @@
 import numpy as np
 
-def init(X, num_layers, hidden):
+def init(X, num_layers, hidden, num_epochs):
 
 	#np.random.seed(256)
 	num_trainset = X.shape[0]
@@ -41,5 +41,7 @@ def init(X, num_layers, hidden):
 	for i in xrange(num_layers-1): # 0 1
 		temp = np.random.randn(hidden[i]+1, hidden[i+1])
 		dtheta.append(temp) #dtheta indices: 1 2 ...
-	
-	return out, net_in, net_in_bias, theta, error, dtheta
+
+	loss = np.zeros((num_epochs, 1))
+
+	return out, net_in, net_in_bias, theta, error, dtheta, loss
