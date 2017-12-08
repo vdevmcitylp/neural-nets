@@ -7,16 +7,16 @@ import matplotlib.pyplot as plt
 X, Y_nb = read_data.input()
 
 X = X.reshape(X.shape[0], X.shape[1])
-Y = label_binarize.label_binarize(Y_nb, classes = [0, 1])
+Y = label_binarize.label_binarize(Y_nb, classes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
 
 num_trainset = X.shape[0]
 
 alpha = 0.0001
 
 # UPDATE THESE
-num_class = 2
+num_class = 10
 num_layers = 3
-hidden = [2, 3, 2] # No. of nodes in each layer
+hidden = [784, 30, 10] # No. of nodes in each layer
 # UPDATE THESE
 
 num_epochs = 10000
@@ -25,6 +25,14 @@ num_batches = num_trainset/10
 
 out, net_in, net_in_bias, theta, error, dtheta, loss = initialize.init(X, num_layers, hidden, num_epochs)
 #print theta[1]
+
+# h = 0.02
+# x_min, x_max = X[:, 0].min()-1, X[:, 0].max()+1
+# y_min, y_max = X[:, 1].min()-1, X[:, 1].max()+1
+
+# xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
+
+# Z = np.c_[xx.ravel(), yy.ravel()]
 
 for epoch in xrange(num_epochs):
 	print epoch,
@@ -47,7 +55,7 @@ for epoch in xrange(num_epochs):
 	out, _, _, _, _, _, _ = initialize.init(X, num_layers, hidden, num_batches)
 	out, _, _ = forwardprop.forward(num_layers, num_trainset, net_in_bias, out, net_in, theta)		
 	loss[epoch] = performance_metrics.loss(Y, out[num_layers-1], Y.shape[0])
-	#plot.plot_boundary(X, Y_nb, out, num_layers, net_in_bias, net_in, theta)
+	#plot.plot_boundary(X, Y_nb, out, num_layers, net_in_bias, net_in, theta, epoch, Z, xx, yy)
 
 out, _, _, _, _, _, _ = initialize.init(X, num_layers, hidden, num_batches)
 out, _, _ = forwardprop.forward(num_layers, num_trainset, net_in_bias, out, net_in, theta)
@@ -57,5 +65,5 @@ print "Precision: " + str(performance_metrics.precision(Y, out[num_layers-1], nu
 print "Recall: " + str(performance_metrics.recall(Y, out[num_layers-1], num_class))
 print "Error: " + str(performance_metrics.sum_error(error, num_layers))
 
-plot.plot_boundary(X, Y_nb, out, num_layers, net_in_bias, net_in, theta)
+#plot.plot_boundary(X, Y_nb, out, num_layers, net_in_bias, net_in, theta, 0)
 plot.plot_loss(np.arange(num_epochs), loss)
